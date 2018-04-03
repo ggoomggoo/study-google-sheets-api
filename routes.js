@@ -32,6 +32,7 @@ router.get('/', function(req, res, next) {
   models.Order.findAll(options)
   .then(function(orders) {
     res.render('index', {
+      title: 'Orders',
       orders: orders
     });
   }, function(err) {
@@ -40,13 +41,18 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/create', function(req, res, next) {
-  res.render('upsert');
+  res.render('upsert', {
+    title: 'Create Order'
+  }, function(err) {
+    next(err);
+  });
 });
 
 router.get('/edit/:id', function(req, res, next) {
   models.Order.findById(req.params.id).then(function(order) {
     if (order) {
       res.render('upsert', {
+        title: 'Edit Order',
         order: order
       });
     } else {
