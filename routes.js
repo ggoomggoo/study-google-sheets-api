@@ -24,16 +24,17 @@ var router = express.Router();
 var models = require('./models');
 var Sequelize = require('sequelize');
 
-// TODO: Show spreadsheets on the main page.
 router.get('/', function(req, res, next) {
   var options = {
     order: [['createdAt', 'DESC']]
   };
-  models.Order.findAll(options)
-  .then(function(orders) {
+  Sequelize.Promise.all([
+    models.Order.findAll(options),
+    models.Spreadsheet.findAll(options)
+  ]).then(function(results) {
     res.render('index', {
-      title: 'Orders',
-      orders: orders
+      orders: results[0],
+      spreadsheets: results[1]
     });
   }, function(err) {
     next(err);
@@ -41,18 +42,13 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/create', function(req, res, next) {
-  res.render('upsert', {
-    title: 'Create Order'
-  }, function(err) {
-    next(err);
-  });
+  res.render('upsert');
 });
 
 router.get('/edit/:id', function(req, res, next) {
   models.Order.findById(req.params.id).then(function(order) {
     if (order) {
       res.render('upsert', {
-        title: 'Edit Order',
         order: order
       });
     } else {
